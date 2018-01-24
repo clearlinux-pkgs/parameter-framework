@@ -1,0 +1,26 @@
+From f5fa33c646a16033188b4daecbe5e23d5fcafbea Mon Sep 17 00:00:00 2001
+From: William Douglas <william.douglas@intel.com>
+Date: Wed, 24 Jan 2018 16:48:42 +0000
+Subject: [PATCH] Disable -Werror
+
+---
+ CMakeLists.txt | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3130016..d7147d3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -86,8 +86,7 @@ if(WIN32)
+     # FIXME: Once we have removed all warnings on windows, add the /WX flags if
+     # FATAL_WARNINGS is enabled
+ else()
+-    add_compile_options(-Wall -Wextra -Wconversion -Wno-sign-conversion
+-                 $<$<BOOL:FATAL_WARNINGS>:-Werror>)
++    add_compile_options(-Wall -Wextra -Wconversion -Wno-sign-conversion)
+ endif()
+ 
+ # Hide symbols by default, then exposed symbols are the same in linux and windows
+-- 
+2.15.1
+
