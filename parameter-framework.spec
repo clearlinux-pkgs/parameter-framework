@@ -4,7 +4,7 @@
 #
 Name     : parameter-framework
 Version  : 3.2.8
-Release  : 10
+Release  : 11
 URL      : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Source0  : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Summary  : No detailed summary available
@@ -13,10 +13,11 @@ License  : BSD-3-Clause
 Requires: parameter-framework-bin
 Requires: parameter-framework-python3
 Requires: parameter-framework-data
+Requires: parameter-framework-license
 Requires: parameter-framework-python
 BuildRequires : asio-dev
+BuildRequires : buildreq-cmake
 BuildRequires : catch2-dev
-BuildRequires : cmake
 BuildRequires : pkgconfig(libxml-2.0)
 BuildRequires : python3
 Patch1: 0001-Disable-Werror.patch
@@ -31,6 +32,7 @@ Patch1: 0001-Disable-Werror.patch
 Summary: bin components for the parameter-framework package.
 Group: Binaries
 Requires: parameter-framework-data
+Requires: parameter-framework-license
 
 %description bin
 bin components for the parameter-framework package.
@@ -53,6 +55,14 @@ Provides: parameter-framework-devel
 
 %description dev
 dev components for the parameter-framework package.
+
+
+%package license
+Summary: license components for the parameter-framework package.
+Group: Default
+
+%description license
+license components for the parameter-framework package.
 
 
 %package python
@@ -82,26 +92,24 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C
-export SOURCE_DATE_EPOCH=1516812578
+export SOURCE_DATE_EPOCH=1533069838
 mkdir clr-build
 pushd clr-build
-cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_SHARED_LIBS:BOOL=ON -DLIB_INSTALL_DIR:PATH=/usr/lib64 -DCMAKE_AR=/usr/bin/gcc-ar -DLIB_SUFFIX=64 -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_RANLIB=/usr/bin/gcc-ranlib -DCMAKE_INCLUDE_PATH=/usr/include/catch -DPYTHON_BINDINGS=OFF -DBUILD_TESTING=OFF -DFATAL_WARNINGS:BOOL=OFF
+%cmake .. -DCMAKE_INCLUDE_PATH=/usr/include/catch -DPYTHON_BINDINGS=OFF -DBUILD_TESTING=OFF -DFATAL_WARNINGS:BOOL=OFF
 make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1516812578
+export SOURCE_DATE_EPOCH=1533069838
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/doc/parameter-framework
+cp COPYING.txt %{buildroot}/usr/share/doc/parameter-framework/COPYING.txt
 pushd clr-build
 %make_install
 popd
 
 %files
 %defattr(-,root,root,-)
-/usr/lib/cmake/ParameterFramework/ParameterFrameworkConfig.cmake
-/usr/lib/cmake/ParameterFramework/ParameterFrameworkConfigVersion.cmake
-/usr/lib/cmake/ParameterFramework/ParameterFrameworkTargets-relwithdebinfo.cmake
-/usr/lib/cmake/ParameterFramework/ParameterFrameworkTargets.cmake
 
 %files bin
 %defattr(-,root,root,-)
@@ -183,9 +191,17 @@ popd
 /usr/include/parameter/xmlserializer/XmlSerializingContext.h
 /usr/include/parameter/xmlserializer/XmlSink.h
 /usr/include/parameter/xmlserializer/XmlSource.h
+/usr/lib/cmake/ParameterFramework/ParameterFrameworkConfig.cmake
+/usr/lib/cmake/ParameterFramework/ParameterFrameworkConfigVersion.cmake
+/usr/lib/cmake/ParameterFramework/ParameterFrameworkTargets-relwithdebinfo.cmake
+/usr/lib/cmake/ParameterFramework/ParameterFrameworkTargets.cmake
 /usr/lib/libcparameter.so
 /usr/lib/libparameter.so
 /usr/lib/libremote-processor.so
+
+%files license
+%defattr(-,root,root,-)
+/usr/share/doc/parameter-framework/COPYING.txt
 
 %files python
 %defattr(-,root,root,-)
