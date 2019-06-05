@@ -4,7 +4,7 @@
 #
 Name     : parameter-framework
 Version  : 3.2.8
-Release  : 13
+Release  : 14
 URL      : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Source0  : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Summary  : No detailed summary available
