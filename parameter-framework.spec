@@ -4,23 +4,29 @@
 #
 Name     : parameter-framework
 Version  : 3.2.8
-Release  : 15
+Release  : 16
 URL      : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Source0  : https://github.com/intel/parameter-framework/archive/v3.2.8.tar.gz
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : BSD-3-Clause
-Requires: parameter-framework-bin
-Requires: parameter-framework-python3
-Requires: parameter-framework-data
-Requires: parameter-framework-license
-Requires: parameter-framework-python
+Requires: parameter-framework-bin = %{version}-%{release}
+Requires: parameter-framework-data = %{version}-%{release}
+Requires: parameter-framework-license = %{version}-%{release}
+Requires: parameter-framework-python = %{version}-%{release}
+Requires: parameter-framework-python3 = %{version}-%{release}
 BuildRequires : asio-dev
 BuildRequires : buildreq-cmake
 BuildRequires : catch2-dev
+BuildRequires : doxygen
+BuildRequires : glibc-dev
+BuildRequires : libxml2-dev
 BuildRequires : pkgconfig(libxml-2.0)
 BuildRequires : python3
+BuildRequires : python3-dev
+BuildRequires : swig
 Patch1: 0001-Disable-Werror.patch
+Patch2: 0002-enable-test-platform-pthread.patch
 
 %description
 # parameter-framework
@@ -31,8 +37,8 @@ Patch1: 0001-Disable-Werror.patch
 %package bin
 Summary: bin components for the parameter-framework package.
 Group: Binaries
-Requires: parameter-framework-data
-Requires: parameter-framework-license
+Requires: parameter-framework-data = %{version}-%{release}
+Requires: parameter-framework-license = %{version}-%{release}
 
 %description bin
 bin components for the parameter-framework package.
@@ -49,9 +55,10 @@ data components for the parameter-framework package.
 %package dev
 Summary: dev components for the parameter-framework package.
 Group: Development
-Requires: parameter-framework-bin
-Requires: parameter-framework-data
-Provides: parameter-framework-devel
+Requires: parameter-framework-bin = %{version}-%{release}
+Requires: parameter-framework-data = %{version}-%{release}
+Provides: parameter-framework-devel = %{version}-%{release}
+Requires: parameter-framework = %{version}-%{release}
 
 %description dev
 dev components for the parameter-framework package.
@@ -68,7 +75,7 @@ license components for the parameter-framework package.
 %package python
 Summary: python components for the parameter-framework package.
 Group: Default
-Requires: parameter-framework-python3
+Requires: parameter-framework-python3 = %{version}-%{release}
 
 %description python
 python components for the parameter-framework package.
@@ -86,24 +93,33 @@ python3 components for the parameter-framework package.
 %prep
 %setup -q -n parameter-framework-3.2.8
 %patch1 -p1
+%patch2 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1533069838
-mkdir clr-build
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1563950402
+mkdir -p clr-build
 pushd clr-build
+export GCC_IGNORE_WERROR=1
+export AR=gcc-ar
+export RANLIB=gcc-ranlib
+export NM=gcc-nm
+export CFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FCFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export FFLAGS="$CFLAGS -O3 -ffat-lto-objects -flto=4 "
+export CXXFLAGS="$CXXFLAGS -O3 -ffat-lto-objects -flto=4 "
 %cmake .. -DCMAKE_INCLUDE_PATH=/usr/include/catch -DPYTHON_BINDINGS=OFF -DBUILD_TESTING=OFF -DFATAL_WARNINGS:BOOL=OFF
-make  %{?_smp_mflags}
+make  %{?_smp_mflags} VERBOSE=1
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1533069838
+export SOURCE_DATE_EPOCH=1563950402
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/parameter-framework
-cp COPYING.txt %{buildroot}/usr/share/doc/parameter-framework/COPYING.txt
+mkdir -p %{buildroot}/usr/share/package-licenses/parameter-framework
+cp COPYING.txt %{buildroot}/usr/share/package-licenses/parameter-framework/COPYING.txt
 pushd clr-build
 %make_install
 popd
@@ -200,8 +216,8 @@ popd
 /usr/lib/libremote-processor.so
 
 %files license
-%defattr(-,root,root,-)
-/usr/share/doc/parameter-framework/COPYING.txt
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/parameter-framework/COPYING.txt
 
 %files python
 %defattr(-,root,root,-)
